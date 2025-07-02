@@ -14,7 +14,6 @@
     ],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "nxCloudId": "68654458bf4f6877bdf57aa1",
   "plugins": [
     {
       "plugin": "@nx/webpack/plugin",
@@ -39,5 +38,14 @@
       },
       "exclude": ["apps/erp-api-e2e/**/*"]
     }
-  ]
+  ],
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
+      }
+    }
+  },
+  "neverConnectToCloud": true 
 }
