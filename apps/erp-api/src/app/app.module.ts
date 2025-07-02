@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ErpSystemSharedConfigModule } from '@erp-system/erp-system/shared-config';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [
+        ErpSystemSharedConfigModule
+    ],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}
