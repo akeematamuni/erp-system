@@ -1,1 +1,1 @@
-export * from './lib/erp-system/shared-config.module';
+export * from './shared-config.module';
