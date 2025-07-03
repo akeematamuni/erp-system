@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@erp-system/erp-system/shared-config": [
+      "@erp-system/shared-config": [
         "libs/shared/config/src/index.ts"
       ]
     }
