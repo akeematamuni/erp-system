@@ -7,3 +7,5 @@ import { TenantService } from './application/tenant.service';
   exports: [TenantService],
 })
 export class TenancyModule {}
+
+// cont. step 5+ Log, Test, Doc
