@@ -6,3 +6,4 @@ It is designed for local-first development using Docker Compose and a clean mono
 
 The system includes core business modules such as Inventory, Procurement, Finance, and HR, and is designed to support PostgreSQL multi-tenancy, RBAC, and API gateway routing.  
 
+**
