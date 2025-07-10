@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { TenantService } from '../application/tenant.service';
-import { LoggerToken, ContextualLoggerService } from '@erp-system/shared-logger';
+import { LoggerToken, CustomLoggerService } from '@erp-system/shared-logger';
 
 // Middleware to resolve tenant's schema
 @Injectable()
@@ -12,7 +12,7 @@ export class TenantMiddleware implements NestMiddleware {
     private readonly logger: LoggerService;
 
     constructor(
-        @Inject(LoggerToken) base: ContextualLoggerService,
+        @Inject(LoggerToken) base: CustomLoggerService,
         private readonly tenantService: TenantService
     ) {
         this.logger = base.addContext(TenantMiddleware.name);
