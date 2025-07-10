@@ -10,8 +10,8 @@ import { TenantMiddleware } from '@erp-system/tenancy';
 @Module({
     imports: [
         ErpSystemSharedConfigModule,
+        SharedLoggerModule.forRoot(),
         SharedDatabaseModule,
-        SharedLoggerModule,
         TenancyModule
     ],
     controllers: [AppController],
