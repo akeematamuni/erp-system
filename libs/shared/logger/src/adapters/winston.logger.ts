@@ -1,35 +1,49 @@
 // **** Work on winston logger to match nest logger
 
+import { Injectable, LoggerService } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as winston from 'winston';
+import { winstonOptions } from '../configs/logger.config';
+import { CustomLoggerService } from '../ports/custom-logger.service';
 
-// import { Injectable, LoggerService } from '@nestjs/common';
-// import * as winston from 'winston';
+@Injectable()
+export class WinstonLogger implements CustomLoggerService {
+    private readonly logger: winston.Logger;
 
-// @Injectable()
-// export class WinstonLogger implements LoggerService {
-//     private logger = winston.createLogger({
-//         level: 'debug',
-//         format: winston.format.combine(
-//             winston.format.timestamp(),
-//             winston.format.printf(({ level, message, timestamp }) => {
-//                 return `[${timestamp}] ${level}: ${message}`;
-//             })
-//         ),
-//         transports: [new winston.transports.Console()],
-//     });
+    constructor(
+        private readonly context = 'ERP-System',
+        private readonly config = new ConfigService()
+    ) {
+        const format = config.get<'json'>('LOGGER_FORMAT');
+        const output = config.get<'file' | 'both'>('LOGGER_OUTPUT');
 
-//     log(message: string) {
-//         this.logger.info(message);
-//     }
+        // Winston logging method, equivalent to Nest Logger
+        this.logger = winston.createLogger(
+            winstonOptions({ format, output }, context)
+        );
+    }
 
-//     warn(message: string) {
-//         this.logger.warn(message);
-//     }
+    log(message: string) {
+        this.logger.info(message);
+    }
 
-//     debug(message: string) {
-//         this.logger.debug(message);
-//     }
+    warn(message: string) {
+        this.logger.warn(message);
+    }
 
-//     error(message: string, trace?: string) {
-//         this.logger.error(message + (trace ? `\n${trace}` : ''));
-//     }
-// }
+    debug(message: string) {
+        this.logger.debug(message);
+    }
+
+    verbose(message: string) {
+        this.logger.verbose(message);
+    }
+
+    error(message: string, trace?: string) {
+        this.logger.error(message + (trace ? `\n${trace}` : ''));
+    }
+
+    addContext(context: string): LoggerService {
+        return new WinstonLogger(context);
+    }
+}
