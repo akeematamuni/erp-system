@@ -1,11 +1,11 @@
 import { Logger, LoggerService } from '@nestjs/common';
-import { ContextualLoggerService } from '../ports/contextual-logger.service';
+import { CustomLoggerService } from '../ports/custom-logger.service';
 
 // Adapting nest logger to be used in a custom way
-export class NestLogger implements ContextualLoggerService {
+export class NestLogger implements CustomLoggerService {
     private readonly logger: Logger;
 
-    constructor(private context = 'ERP-System') {
+    constructor(private readonly context = 'ERP-System') {
         this.logger = new Logger(context);
     }
 
@@ -26,7 +26,8 @@ export class NestLogger implements ContextualLoggerService {
     }
 
     error(message: string, trace?: string) {
-        this.logger.error(message, trace);
+        // this.logger.error(message, trace);
+        this.logger.error(message + (trace ? `\n${trace}` : ''));
     }
 
     addContext(context: string): LoggerService {
