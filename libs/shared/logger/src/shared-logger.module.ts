@@ -3,7 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { ErpSystemSharedConfigModule } from '@erp-system/shared-config';
 import { LoggerToken } from './logger.tokens';
 import { NestLogger } from './adapters/nest.logger';
-import { ContextualLoggerService } from './ports/contextual-logger.service';
+import { WinstonLogger } from './adapters/winston.logger';
+import { CustomLoggerService } from './ports/custom-logger.service';
 
 // Dynamically inject the appropriate logging mechanism
 @Module({})
@@ -12,10 +13,12 @@ export class SharedLoggerModule {
         const loggerProvider: Provider = {
             provide: LoggerToken,
             inject: [ConfigService],
-            useFactory: (config: ConfigService): ContextualLoggerService => {
+            useFactory: (config: ConfigService): CustomLoggerService => {
                 const loggerType = config.get('LOGGER_TYPE') as string;
 
                 switch (loggerType) {
+                    case 'winston':
+                        return new WinstonLogger();
                     case 'nest':
                     default:
                         return new NestLogger();
