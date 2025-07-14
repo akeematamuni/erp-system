@@ -1,6 +1,7 @@
 # shared-logger
 
-This library was generated with [Nx](https://nx.dev).
+This module helps define what logging mechanism would be used through out the entire repo.  
+The default case is `Logger` from [Nest](https://docs.nestjs.com/techniques/logger), there is option fro using [winston](https://github.com/winstonjs/winston) also.
 
 ## Running unit tests
 
