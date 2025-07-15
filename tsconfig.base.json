@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@erp-system/shared-auth": ["libs/shared/auth/src/index.ts"],
       "@erp-system/shared-config": ["libs/shared/config/src/index.ts"],
       "@erp-system/shared-database": ["libs/shared/database/src/index.ts"],
       "@erp-system/shared-logger": ["libs/shared/logger/src/index.ts"],
