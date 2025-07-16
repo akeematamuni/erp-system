@@ -7,7 +7,7 @@ export class TenantService {
     constructor(
         private readonly dataSource: DataSource,
         private readonly tenantRepo: TenantRepository
-    ){}
+    ) {}
 
     async resolveTenant(tenantId: string) {
         return this.tenantRepo.findById(tenantId);
