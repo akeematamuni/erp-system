@@ -20,11 +20,11 @@ export class UserRepository implements IUserRepository {
         return await this.repo.findOne({ where: { email } });
     }
 
-    async findByDepartment(department: string): Promise<User[]> {
-        return await this.repo.find({ where: { department } });
+    async doesUserExist(email: string): Promise<boolean> {
+        return await this.repo.count({ where: { email } }) > 0;
     }
 
-    async userExist(email: string): Promise<boolean> {
-        return await this.repo.count({ where: { email } }) > 0;
+    async findByDepartment(department: string): Promise<User[]> {
+        return await this.repo.find({ where: { department } });
     }
 }
