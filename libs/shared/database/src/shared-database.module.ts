@@ -12,7 +12,7 @@ import { ErpSystemSharedConfigModule } from '@erp-system/shared-config';
                 type: 'postgres',
                 url: config.get<string>('DATABASE_URL'),
                 autoLoadEntities: true,
-                synchronize: true // Remove for prod
+                synchronize: false
             })
         }),
     ],
