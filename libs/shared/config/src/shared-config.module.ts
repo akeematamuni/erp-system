@@ -4,7 +4,7 @@ import { configSchema } from './config/config.schema.js';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
-const parsed = configSchema.safeParse(process.env);
+export const parsed = configSchema.safeParse(process.env);
 
 const logger = new Logger('SharedConfig');
 if (!parsed.success) {
