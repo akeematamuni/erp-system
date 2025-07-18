@@ -2,7 +2,9 @@
   "name": "@erp-system/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "typeorm": "tsx --tsconfig ./tsconfig.cli.json node_modules/typeorm/cli.js"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^11.0.0",
@@ -57,7 +59,9 @@
     "prettier": "^2.6.2",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "tslib": "^2.3.0",
+    "tsx": "^4.20.3",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.29.0",
     "webpack-cli": "^5.1.4"

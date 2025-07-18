@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "es2015",
+    "outDir": "dist/out-tsc-cli",
+    "types": ["node"]
+  },
+  "include": ["libs/**/*.ts", "apps/**/*.ts"],
+  "exclude": ["node_modules", "tmp", "dist"]
+}
