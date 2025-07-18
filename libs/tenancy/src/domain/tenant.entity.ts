@@ -5,9 +5,9 @@ export class Tenant {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     name!: string;
 
-    @Column({ name: 'schema_name' })
+    @Column({ name: 'schema_name', type: 'varchar' })
     schema!: string; 
 }
