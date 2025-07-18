@@ -11,25 +11,25 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     fullname!: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     role!: string;
 
-    @Column({ nullable: true })
-    department!: string;
+    @Column({ type: 'varchar', nullable: true })
+    department?: string;
 
-    @Column({ nullable: true })
-    createdBy!: string;
+    @Column({ type: 'varchar', nullable: true })
+    createdBy?: string;
 
-    @Column({ default: true })
+    @Column({ type: 'boolean', default: true })
     isActive!: boolean;
 
-    @Column({ unique: true })
+    @Column({ type: 'varchar', unique: true })
     email!: string;
 
-    @Column()
+    @Column({ type: 'varchar' })
     password!: string;
 
     @CreateDateColumn()
