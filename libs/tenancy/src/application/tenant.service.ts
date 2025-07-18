@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
 import { TenantRepository } from '../infrastructure/tenant.repository';
 
 @Injectable()
 export class TenantService {
-    constructor(
-        private readonly dataSource: DataSource,
-        private readonly tenantRepo: TenantRepository
-    ) {}
+    constructor(private readonly tenantRepo: TenantRepository) {}
 
+    async registerTenant(name: string) {
+        return this.tenantRepo.createTenant(name);
+    }
+    
     async resolveTenant(tenantId: string) {
         return this.tenantRepo.findById(tenantId);
     }
 
     async setSearchPath(schema: string) {
-        await this.dataSource.query(`SET search_path TO ${schema}, public`)
+        await this.tenantRepo.setSchema(schema);
     }
 }
