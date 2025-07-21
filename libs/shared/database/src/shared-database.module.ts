@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ErpSystemSharedConfigModule } from '@erp-system/shared-config';
+import { Tenant } from '@erp-system/tenancy';
 
 @Module({
     imports: [
@@ -11,7 +12,7 @@ import { ErpSystemSharedConfigModule } from '@erp-system/shared-config';
             useFactory: (config: ConfigService) => ({
                 type: 'postgres',
                 url: config.get<string>('DATABASE_URL'),
-                autoLoadEntities: true,
+                entities: [Tenant],
                 synchronize: false
             })
         }),
