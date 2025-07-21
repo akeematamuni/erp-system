@@ -6,13 +6,15 @@ import { SharedDatabaseModule } from '@erp-system/shared-database';
 import { SharedLoggerModule } from '@erp-system/shared-logger';
 import { TenancyModule } from '@erp-system/tenancy';
 import { TenantMiddleware } from '@erp-system/tenancy';
+import { SharedAuthModule } from '@erp-system/shared-auth';
 
 @Module({
     imports: [
         ErpSystemSharedConfigModule,
         SharedLoggerModule.forRoot(),
         SharedDatabaseModule,
-        TenancyModule
+        TenancyModule,
+        SharedAuthModule
     ],
     controllers: [AppController],
     providers: [AppService],
@@ -22,9 +24,9 @@ export class AppModule implements NestModule{
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(TenantMiddleware)
         .exclude(
-            { path: 'auth/register', method: RequestMethod.POST },
-            { path: 'auth/login', method: RequestMethod.POST }
+            { path: 'api/v1/auth/register', method: RequestMethod.POST },
+            { path: 'api/v1/auth/login', method: RequestMethod.POST }
         )
-        .forRoutes('*');
+        .forRoutes('api/v1/*path');
     }
 }
