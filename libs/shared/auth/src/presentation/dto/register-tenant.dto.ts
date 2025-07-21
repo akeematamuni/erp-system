@@ -1,18 +1,12 @@
 import { IsNotEmpty, IsEmail, IsString, MinLength } from 'class-validator';
+import { LoginUserDto } from './login-tenant.dto';
 
-export class RegisterTenantDto {
+export class RegisterTenantDto extends LoginUserDto {
     @IsString()
     @IsNotEmpty()
     enterpriseName!: string;
 
     @IsString()
     @IsNotEmpty()
-    fullname!: string;
-
-    @IsEmail()
-    email!: string;
-
-    @IsString()
-    @MinLength(8)
-    password!: string;
+    fullName!: string;
 }
