@@ -1,9 +1,10 @@
 import { ConflictException, Inject, Injectable, InternalServerErrorException, LoggerService } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { publicDataOptions } from '@erp-system/shared-database';
+import { tenantDataOptions } from '@erp-system/shared-database';
 import { Tenant } from '../domain/tenant.entity';
 import { ITenantRepository } from '../domain/tenant.repository.interface';
 import { LoggerToken, CustomLoggerService } from '@erp-system/shared-logger';
+import { User } from '@erp-system/shared-auth';
 
 // cont step 5. Tenant Repository (Infrastructure Layer)
 @Injectable()
@@ -31,41 +32,67 @@ export class TenantRepository implements ITenantRepository {
 
     async createTenant(name: string) {
         const schema = this.generateSchemaName(name);
-        const existing = await this.dataSource.getRepository(Tenant).findOne({ where: { schema } });
 
-        if (existing) {
-            this.logger.warn(`Tenant with "${schema} exists.."`);
-            throw new ConflictException('Tenant already exist..');
+        try {
+            const existing = await this.dataSource
+            .getRepository(Tenant)
+            .findOne({ where: { schema } });
+
+            if (existing) {
+                this.logger.warn(`Tenant with "${schema} exists.."`);
+                throw new ConflictException('Tenant already exist..');
+            }
+            this.logger.log(`Schema name generated: ${schema}`);
+
+        } catch (error) {
+            this.logger.error(`Error during initial tenant check:\n${error}`);
+            if (error instanceof ConflictException) throw error;
+            throw new InternalServerErrorException('Internal error during tenant check...');
         }
 
         // Utilize query runner to create new tenant
+        let tenant: Tenant;
         const queryRunner = this.dataSource.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-
+    
         try {
+            await queryRunner.connect();
+            await queryRunner.startTransaction();
             await queryRunner.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
-            const tenant = queryRunner.manager.create(Tenant, { name, schema });
+
+            tenant = queryRunner.manager.create(Tenant, { name, schema });
+
             await queryRunner.manager.save(tenant);
             await queryRunner.commitTransaction();
             await queryRunner.release()
             
-            const newDataSource = new DataSource({
-                ...publicDataOptions,
+            this.logger.log(`New tenant "${schema}" has been created..`);
+
+        } catch (error) {
+            if (queryRunner.isTransactionActive) {
+                await queryRunner.rollbackTransaction();
+                this.logger.warn(`Transaction for schema "${schema}" rolled back..`);
+            }
+            // Might have to delete already created schema******
+            this.logger.error(`There was error creating tenant ${schema}.\n${error}`);
+            throw new InternalServerErrorException('Error during tenant creation..');
+        }
+
+        try {
+            const tenantDataSource = new DataSource({
+                ...tenantDataOptions,
                 name: `${schema}-dts`,
+                logging: true,
                 schema
             });
 
-            await newDataSource.initialize();
-            await newDataSource.runMigrations();
+            await tenantDataSource.initialize();
+            await tenantDataSource.runMigrations();
 
-            this.logger.log(`New tenant "${schema}" has been created..`);
-            return tenant;
-
+            return { tenant, tenantDataSource };
+        
         } catch (error) {
-            await queryRunner.rollbackTransaction();
-            this.logger.error(`There was error creating tenant schema.\n${error}`);
-            throw new InternalServerErrorException('Error creating tenant..');
+            this.logger.error(`Error running migrations on schema: ${schema}`);
+            throw new InternalServerErrorException('Error running migrations..');
         }
     }
 }
