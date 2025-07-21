@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from '../domain/user.entity';
 import { IUserRepository } from '../domain/user.repository.interface';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
-    constructor(@InjectRepository(User) private readonly repo: Repository<User>) {}
+    private readonly repo: Repository<User>;
+
+    constructor(tenantDataSource: DataSource) {
+        this.repo = tenantDataSource.getRepository(User);
+    }
 
     async save(user: User): Promise<User> {
         return await this.repo.save(user);
