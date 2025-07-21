@@ -5,6 +5,7 @@ import {
     UpdateDateColumn,
     PrimaryGeneratedColumn
 } from 'typeorm';
+import { RoleType } from './enums';
 
 @Entity('users')
 export class User {
@@ -14,8 +15,8 @@ export class User {
     @Column({ type: 'varchar' })
     fullname!: string;
 
-    @Column({ type: 'varchar' })
-    role!: string;
+    @Column({ type: 'enum', enum: RoleType })
+    role!: RoleType;
 
     @Column({ type: 'varchar', nullable: true })
     department?: string;
@@ -31,6 +32,9 @@ export class User {
 
     @Column({ type: 'varchar' })
     password!: string;
+
+    @Column({ type: 'varchar' })
+    tenantId!: string;
 
     @CreateDateColumn()
     createdAt!: Date;
