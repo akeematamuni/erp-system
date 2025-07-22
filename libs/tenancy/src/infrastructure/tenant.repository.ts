@@ -4,7 +4,8 @@ import { tenantDataOptions } from '@erp-system/shared-database';
 import { Tenant } from '../domain/tenant.entity';
 import { ITenantRepository } from '../domain/tenant.repository.interface';
 import { LoggerToken, CustomLoggerService } from '@erp-system/shared-logger';
-import { User } from '@erp-system/shared-auth';
+// import { User } from '@erp-system/shared-auth';
+// import { CreateUserTable1753118629025 } from '@erp-system/shared-database';
 
 // cont step 5. Tenant Repository (Infrastructure Layer)
 @Injectable()
@@ -81,17 +82,17 @@ export class TenantRepository implements ITenantRepository {
             const tenantDataSource = new DataSource({
                 ...tenantDataOptions,
                 name: `${schema}-dts`,
-                logging: true,
                 schema
             });
-
+            
             await tenantDataSource.initialize();
             await tenantDataSource.runMigrations();
 
+            this.logger.log(`Successfully ran migrations for tenant: ${schema}`);
             return { tenant, tenantDataSource };
         
         } catch (error) {
-            this.logger.error(`Error running migrations on schema: ${schema}`);
+            this.logger.error(`Error running migrations on schema: ${schema}\n${error}`);
             throw new InternalServerErrorException('Error running migrations..');
         }
     }
