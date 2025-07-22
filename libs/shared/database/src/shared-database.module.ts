@@ -12,8 +12,9 @@ import { Tenant } from '@erp-system/tenancy';
             useFactory: (config: ConfigService) => ({
                 type: 'postgres',
                 url: config.get<string>('DATABASE_URL'),
+                ssl: { rejectUnauthorized: false },
                 entities: [Tenant],
-                synchronize: false
+                synchronize: false,
             })
         }),
     ],
