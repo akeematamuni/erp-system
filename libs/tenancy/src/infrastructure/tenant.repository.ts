@@ -4,8 +4,6 @@ import { tenantDataOptions } from '@erp-system/shared-database';
 import { Tenant } from '../domain/tenant.entity';
 import { ITenantRepository } from '../domain/tenant.repository.interface';
 import { LoggerToken, CustomLoggerService } from '@erp-system/shared-logger';
-// import { User } from '@erp-system/shared-auth';
-// import { CreateUserTable1753118629025 } from '@erp-system/shared-database';
 
 // cont step 5. Tenant Repository (Infrastructure Layer)
 @Injectable()
@@ -18,43 +16,66 @@ export class TenantRepository implements ITenantRepository {
     ) {
         this.logger = base.addContext(TenantRepository.name);
     }
-
-    private generateSchemaName(name: string) {
-        return `tenant_${name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
-    }
-
+    
+    // 
     async findById(id: string) {
         return this.dataSource.getRepository(Tenant).findOne({ where: { id } });
     }
-
+    // 
     async setSchema(schema: string) {
         return this.dataSource.query(`SET search_path TO ${schema}, public`);
     }
 
-    async createTenant(name: string) {
-        const schema = this.generateSchemaName(name);
+    // Tenant creation, rollback and more..
+    private generateSchemaName(name: string) {
+        return `tenant_${name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+    }
+
+    // 
+    private async rollbackTenantCreation(schema: string, tenant: Tenant | null) {
+        this.logger.warn(`Rolling back the failed tenant creation for ${schema}`);
 
         try {
-            const existing = await this.dataSource
-            .getRepository(Tenant)
-            .findOne({ where: { schema } });
-
-            if (existing) {
-                this.logger.warn(`Tenant with "${schema} exists.."`);
-                throw new ConflictException('Tenant already exist..');
-            }
-            this.logger.log(`Schema name generated: ${schema}`);
+            await this.dataSource.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
+            this.logger.log(`Successfully dropped schema ${schema}`);
 
         } catch (error) {
-            this.logger.error(`Error during initial tenant check:\n${error}`);
-            if (error instanceof ConflictException) throw error;
-            throw new InternalServerErrorException('Internal error during tenant check...');
+            this.logger.warn(`Error dropping schema: ${schema}`);
         }
 
-        // Utilize query runner to create new tenant
-        let tenant: Tenant;
+        if (tenant && tenant.id) {
+            try {
+                await this.dataSource.getRepository(Tenant).delete(tenant.id);
+                this.logger.log(`Tenant entry "${tenant.id}" deleted from public.tenants.`);
+            } catch (error) {
+                this.logger.error(`Failed to delete tenant entry "${tenant.id}"\n${error}`);
+            }
+        } else {
+            this.logger.warn(`No tenant entry to delete for "${schema}" on public.tenant`);
+        }
+
+        this.logger.log(`${schema} rollback completed successfully..`);
+    }
+
+    // 
+    async createTenant(name: string) {
+        const schema = this.generateSchemaName(name);
         const queryRunner = this.dataSource.createQueryRunner();
-    
+        let tenantDataSource: DataSource | undefined;
+        let tenant: Tenant |  null = null;
+
+        const existing = await this.dataSource.getRepository(Tenant).findOne(
+            { where: { schema } }
+        );
+
+        if (existing) {
+            this.logger.warn(`Tenant with "${schema} exists.."`);
+            throw new ConflictException('Tenant already exist..');
+        }
+
+        this.logger.log(`Schema name generated: ${schema}`);
+
+        // Create tenant schema and save record to public
         try {
             await queryRunner.connect();
             await queryRunner.startTransaction();
@@ -64,27 +85,32 @@ export class TenantRepository implements ITenantRepository {
 
             await queryRunner.manager.save(tenant);
             await queryRunner.commitTransaction();
-            await queryRunner.release()
-            
             this.logger.log(`New tenant "${schema}" has been created..`);
 
         } catch (error) {
+            // Rollback transaction if error occurs
             if (queryRunner.isTransactionActive) {
                 await queryRunner.rollbackTransaction();
                 this.logger.warn(`Transaction for schema "${schema}" rolled back..`);
             }
-            // Might have to delete already created schema******
-            this.logger.error(`There was error creating tenant ${schema}.\n${error}`);
+
+            this.logger.error(`Error during initial ${schema} check/creation..\n${error}`);
             throw new InternalServerErrorException('Error during tenant creation..');
+
+        } finally {
+            if (!queryRunner.isReleased) {
+                await queryRunner.release();
+            }
         }
 
-        try {
-            const tenantDataSource = new DataSource({
-                ...tenantDataOptions,
-                name: `${schema}-dts`,
-                schema
-            });
+        // Run migrations on the new schema
+        tenantDataSource = new DataSource({
+            ...tenantDataOptions,
+            name: `${schema}-dts`,
+            schema
+        });
             
+        try {
             await tenantDataSource.initialize();
             await tenantDataSource.runMigrations();
 
@@ -93,7 +119,15 @@ export class TenantRepository implements ITenantRepository {
         
         } catch (error) {
             this.logger.error(`Error running migrations on schema: ${schema}\n${error}`);
+
+            // Specifically cleanup partials
+            await this.rollbackTenantCreation(schema, tenant);
             throw new InternalServerErrorException('Error running migrations..');
+
+        } finally {
+            if (tenantDataSource && tenantDataSource.isInitialized) {
+                await tenantDataSource.destroy();
+            }
         }
     }
 }
