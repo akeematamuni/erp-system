@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TenantRepository } from '../infrastructure/tenant.repository';
+import { Tenant } from '../domain/tenant.entity';
 
 @Injectable()
 export class TenantService {
@@ -15,5 +16,9 @@ export class TenantService {
 
     async setSearchPath(schema: string) {
         await this.tenantRepo.setSchema(schema);
+    }
+
+    async rollbackCreation(schema: string, tenant: Tenant | null) {
+        await this.tenantRepo.rollbackTenantCreation(schema, tenant);
     }
 }

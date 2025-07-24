@@ -32,15 +32,15 @@ export class TenantRepository implements ITenantRepository {
     }
 
     // 
-    private async rollbackTenantCreation(schema: string, tenant: Tenant | null) {
-        this.logger.warn(`Rolling back the failed tenant creation for ${schema}`);
+    async rollbackTenantCreation(schema: string, tenant: Tenant | null) {
+        this.logger.warn(`Rolling back the failed tenant creation for "${schema}"`);
 
         try {
             await this.dataSource.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
-            this.logger.log(`Successfully dropped schema ${schema}`);
+            this.logger.log(`Successfully dropped "${schema}"`);
 
         } catch (error) {
-            this.logger.warn(`Error dropping schema: ${schema}`);
+            this.logger.warn(`Error dropping "${schema}"`);
         }
 
         if (tenant && tenant.id) {
@@ -54,7 +54,7 @@ export class TenantRepository implements ITenantRepository {
             this.logger.warn(`No tenant entry to delete for "${schema}" on public.tenant`);
         }
 
-        this.logger.log(`${schema} rollback completed successfully..`);
+        this.logger.log(`"${schema}" rollback completed successfully..`);
     }
 
     // 
@@ -69,11 +69,11 @@ export class TenantRepository implements ITenantRepository {
         );
 
         if (existing) {
-            this.logger.warn(`Tenant with "${schema} exists.."`);
+            this.logger.warn(`Tenant with "${schema}" exists..`);
             throw new ConflictException('Tenant already exist..');
         }
 
-        this.logger.log(`Schema name generated: ${schema}`);
+        this.logger.log(`Schema name generated: "${schema}"`);
 
         // Create tenant schema and save record to public
         try {
@@ -94,8 +94,10 @@ export class TenantRepository implements ITenantRepository {
                 this.logger.warn(`Transaction for schema "${schema}" rolled back..`);
             }
 
-            this.logger.error(`Error during initial ${schema} check/creation..\n${error}`);
-            throw new InternalServerErrorException('Error during tenant creation..');
+            this.logger.error(`Error during initial "${schema}" check/creation..\n${error}`);
+            throw new InternalServerErrorException(
+                'Error occured during registration, please try later...'
+            );
 
         } finally {
             if (!queryRunner.isReleased) {
@@ -114,20 +116,20 @@ export class TenantRepository implements ITenantRepository {
             await tenantDataSource.initialize();
             await tenantDataSource.runMigrations();
 
-            this.logger.log(`Successfully ran migrations for tenant: ${schema}`);
+            this.logger.log(`Successfully ran migrations for "${schema}"`);
             return { tenant, tenantDataSource };
         
         } catch (error) {
-            this.logger.error(`Error running migrations on schema: ${schema}\n${error}`);
+            this.logger.error(`Error running migrations on "${schema}"\n${error}`);
 
             // Specifically cleanup partials
             await this.rollbackTenantCreation(schema, tenant);
-            throw new InternalServerErrorException('Error running migrations..');
-
-        } finally {
             if (tenantDataSource && tenantDataSource.isInitialized) {
                 await tenantDataSource.destroy();
             }
+            throw new InternalServerErrorException(
+                'Error occured during registration, please try later...'
+            );
         }
     }
 }
