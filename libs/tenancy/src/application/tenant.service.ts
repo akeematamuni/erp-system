@@ -18,7 +18,7 @@ export class TenantService {
         await this.tenantRepo.setSchema(schema);
     }
 
-    async rollbackCreation(schema: string, tenant: Tenant | null) {
-        await this.tenantRepo.rollbackTenantCreation(schema, tenant);
-    }
+    // async rollbackCreation(schema: string, tenant: Tenant | null) {
+    //     await this.tenantRepo.rollbackTenantCreation(schema, tenant);
+    // }
 }
