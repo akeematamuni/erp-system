@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "typeorm": "tsx --tsconfig ./tsconfig.cli.json node_modules/typeorm/cli.js"
+    "typeorm": "tsx --tsconfig ./tsconfig.cli.json node_modules/typeorm/cli.js",
+    "default:schema": "tsx --tsconfig ./tsconfig.cli.json libs/shared/database/src/default-schema.ts" 
   },
   "private": true,
   "dependencies": {
