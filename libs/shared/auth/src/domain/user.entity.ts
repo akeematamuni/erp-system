@@ -24,17 +24,8 @@ export class User {
     @Column({ type: 'varchar', nullable: true })
     createdBy?: string;
 
-    @Column({ type: 'boolean', default: true })
-    isActive!: boolean;
-
     @Column({ type: 'varchar', unique: true })
     email!: string;
-
-    @Column({ type: 'varchar' })
-    password!: string;
-
-    @Column({ type: 'varchar' })
-    tenantId!: string;
 
     @CreateDateColumn()
     createdAt!: Date;

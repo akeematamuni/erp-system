@@ -3,8 +3,7 @@ import { RoleType } from '../../domain/enums';
 import { User } from '../../domain/user.entity';
 import { UserRepository } from '../../infrastructure/user.repository';
 import { RegisterTenantDto } from '../../presentation/dto/register-tenant.dto';
-import { TenantService } from '@erp-system/tenancy';
-import { rollbackTenantCreation } from '@erp-system/tenancy';
+import { TenantService, rollbackTenantCreation } from '@erp-system/tenancy';
 import * as bcrypt from 'bcrypt';
 
 // Register specific handler function
@@ -23,22 +22,21 @@ export async function registerNewTenantAndAdmin(
             const { 
                 tenant, tenantDataSource, dataSource
             } = await tenantService.registerTenant(enterpriseName);
-            // 
+
             const password = await bcrypt.hash(pwd, 10);
 
             try {
+                const user = await tenantService.addNewUser(fullName, email, password, tenant.id);
+
                 const superAdmin = new User();
-                superAdmin.tenantId = tenant.id;
-                superAdmin.fullname = fullName;
-                superAdmin.email = email;
-                superAdmin.password = password;
+                superAdmin.fullname = user.fullname;
+                superAdmin.email = user.email;
                 superAdmin.role = RoleType.SUPER_ADMIN;
 
-                const userRepo = new UserRepository(tenantDataSource);
-                const newSuperAdmin = await userRepo.save(superAdmin);
-
+                const newSuperAdmin = await new UserRepository(tenantDataSource).save(superAdmin);
+                
                 logger.log(`Super admin created for tenant: ${tenant.id} | ${tenant.schema}`);
-                return newSuperAdmin;
+                return {...user, ...newSuperAdmin};
 
             } catch (error) {
                 // logger.error(`Failed to create "${tenant.schema}" super admin..`);
