@@ -4,6 +4,7 @@ import { Tenant } from '../domain/tenant.entity';
 import { ITenantRepository } from '../domain/tenant.repository.interface';
 import { LoggerToken, CustomLoggerService } from '@erp-system/shared-logger';
 import { createNewTenant } from './data-access/create-tenant';
+import { createNewUser } from './data-access/create-public-user';
 
 // cont step 5. Tenant Repository (Infrastructure Layer)
 @Injectable()
@@ -33,5 +34,11 @@ export class TenantRepository implements ITenantRepository {
     async createTenant(name: string) {
         const schema = this.generateSchemaName(name);
         return await createNewTenant(name, schema, this.logger, this.dataSource);
+    }
+
+    async createTenantUser(fullname: string, email: string, password: string, tenantId: string) {
+        return await createNewUser(
+            fullname, email, password, tenantId, this.logger, this.dataSource
+        );
     }
 }

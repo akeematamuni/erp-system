@@ -50,9 +50,7 @@ export async function createNewTenant(
         );
 
     } finally {
-        if (!queryRunner.isReleased) {
-            await queryRunner.release();
-        }
+        if (!queryRunner.isReleased) await queryRunner.release();
     }
 
     // Run migrations on the new schema

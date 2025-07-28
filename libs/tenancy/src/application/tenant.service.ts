@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TenantRepository } from '../infrastructure/tenant.repository';
-import { Tenant } from '../domain/tenant.entity';
+import { PublicUser } from '../domain/public-user.entity';
 
 @Injectable()
 export class TenantService {
@@ -18,7 +18,9 @@ export class TenantService {
         await this.tenantRepo.setSchema(schema);
     }
 
-    // async rollbackCreation(schema: string, tenant: Tenant | null) {
-    //     await this.tenantRepo.rollbackTenantCreation(schema, tenant);
-    // }
+    async addNewUser(fullname: string, email: string, password: string, tenantId: string) {
+        return await this.tenantRepo.createTenantUser(
+            fullname, email, password, tenantId
+        );
+    }
 }
