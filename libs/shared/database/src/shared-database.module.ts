@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ErpSystemSharedConfigModule } from '@erp-system/shared-config';
-import { Tenant } from '@erp-system/tenancy';
+import { Tenant, PublicUser } from '@erp-system/tenancy';
 
 @Module({
     imports: [
@@ -13,7 +13,7 @@ import { Tenant } from '@erp-system/tenancy';
                 type: 'postgres',
                 url: config.get<string>('DATABASE_URL'),
                 ssl: { rejectUnauthorized: false },
-                entities: [Tenant],
+                entities: [Tenant, PublicUser],
                 synchronize: false,
             })
         }),
