@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TenantRepository } from './infrastructure/tenant.repository';
+import { CentralRepository } from './infrastructure/tenant.repository';
 import { TenantService } from './application/tenant.service';
 
 @Module({
-    providers: [TenantRepository, TenantService],
+    providers: [CentralRepository, TenantService],
     exports: [TenantService],
 })
 export class TenancyModule {}
