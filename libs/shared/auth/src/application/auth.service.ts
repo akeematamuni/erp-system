@@ -2,7 +2,9 @@ import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { LoggerToken, CustomLoggerService } from '@erp-system/shared-logger';
 import { TenantService } from '@erp-system/tenancy';
 import { RegisterTenantDto } from '../presentation/dto/register-tenant.dto';
+import { LoginUserDto } from '../presentation/dto/login-tenant.dto';
 import { registerNewTenantAndAdmin } from './handlers/registration.handler';
+import { loginTenantUser } from './handlers/login.handler';
 
 // cont with implem....
 @Injectable()
@@ -23,5 +25,7 @@ export class AuthService {
     }
 
     // ToDo: Login flow ...
-    async loginTenant() {}
+    async loginUser(dto: LoginUserDto) {
+        return await loginTenantUser(dto, this.logger, this.tenantService);
+    }
 }

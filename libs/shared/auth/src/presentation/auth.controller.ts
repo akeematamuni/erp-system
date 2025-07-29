@@ -3,6 +3,7 @@ import { AuthService } from '../application/auth.service';
 import { RegisterTenantDto } from './dto/register-tenant.dto';
 import { RegResponseDto } from './dto/register-response.dto';
 import { plainToInstance, instanceToPlain } from 'class-transformer';
+import { LoginUserDto } from './dto/login-tenant.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,5 +17,10 @@ export class AuthController {
             instanceToPlain(responce), 
             { excludeExtraneousValues: true }
         );
+    }
+
+    @Post('login')
+    async loginUser(@Body(ValidationPipe) dto: LoginUserDto) {
+        return await this.authService.loginUser(dto);
     }
 }
