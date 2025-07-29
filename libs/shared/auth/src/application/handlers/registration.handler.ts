@@ -26,7 +26,9 @@ export async function registerNewTenantAndAdmin(
             const password = await bcrypt.hash(pwd, 10);
 
             try {
-                const user = await tenantService.addNewUser(fullName, email, password, tenant.id);
+                const user = await tenantService.registerPublicUser(
+                    fullName, email, password, tenant.id
+                );
 
                 const superAdmin = new User();
                 superAdmin.fullname = user.fullname;
