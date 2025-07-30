@@ -7,6 +7,7 @@ import { SharedLoggerModule } from '@erp-system/shared-logger';
 import { TenancyModule } from '@erp-system/tenancy';
 import { TenantMiddleware } from '@erp-system/tenancy';
 import { SharedAuthModule } from '@erp-system/shared-auth';
+import { SharedTokenModule } from '@erp-system/shared-token';
 
 @Module({
     imports: [
@@ -14,7 +15,8 @@ import { SharedAuthModule } from '@erp-system/shared-auth';
         SharedLoggerModule.forRoot(),
         SharedDatabaseModule,
         TenancyModule,
-        SharedAuthModule
+        SharedAuthModule,
+        SharedTokenModule
     ],
     controllers: [AppController],
     providers: [AppService],
