@@ -7,4 +7,6 @@ export const configSchema = z.object({
     LOGGER_FORMAT: z.coerce.string(),
     LOGGER_OUTPUT: z.coerce.string(),
     DATABASE_URL: z.coerce.string(),
+    LOGIN_SECRET: z.coerce.string(),
+    REFRESH_SECRET: z.coerce.string()
 });
