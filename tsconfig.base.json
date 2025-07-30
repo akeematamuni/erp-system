@@ -19,6 +19,7 @@
       "@erp-system/shared-config": ["libs/shared/config/src/index.ts"],
       "@erp-system/shared-database": ["libs/shared/database/src/index.ts"],
       "@erp-system/shared-logger": ["libs/shared/logger/src/index.ts"],
+      "@erp-system/shared-token": ["libs/shared/token/src/index.ts"],
       "@erp-system/tenancy": ["libs/tenancy/src/index.ts"]
     }
   },
