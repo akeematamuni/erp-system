@@ -8,6 +8,7 @@ import { TenancyModule } from '@erp-system/tenancy';
 import { TenantMiddleware } from '@erp-system/tenancy';
 import { SharedAuthModule } from '@erp-system/shared-auth';
 import { SharedTokenModule } from '@erp-system/shared-token';
+import { SharedRbacModule } from '@erp-system/shared-rbac';
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import { SharedTokenModule } from '@erp-system/shared-token';
         SharedDatabaseModule,
         TenancyModule,
         SharedAuthModule,
-        SharedTokenModule
+        SharedTokenModule,
+        SharedRbacModule
     ],
     controllers: [AppController],
     providers: [AppService],
