@@ -6,12 +6,14 @@ import { AuthService } from './application/auth.service';
 import { AuthController } from './presentation/auth.controller';
 import { TenancyModule } from '@erp-system/tenancy';
 import { SharedTokenModule } from '@erp-system/shared-token';
+import { SharedRbacModule } from '@erp-system/shared-rbac';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([User]), 
         TenancyModule,
-        SharedTokenModule
+        SharedTokenModule,
+        SharedRbacModule
     ],
     providers: [UserRepository, AuthService],
     controllers: [AuthController],
