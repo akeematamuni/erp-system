@@ -5,7 +5,7 @@ import {
     UpdateDateColumn,
     PrimaryGeneratedColumn
 } from 'typeorm';
-import { RoleType } from './enums';
+import { RoleType } from '@erp-system/shared-types';
 
 @Entity('users')
 export class User {

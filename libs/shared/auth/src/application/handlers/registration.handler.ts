@@ -1,5 +1,5 @@
 import { ConflictException, InternalServerErrorException, LoggerService } from '@nestjs/common';
-import { RoleType } from '../../domain/enums';
+import { RoleType } from '@erp-system/shared-types';
 import { User } from '../../domain/user.entity';
 import { UserRepository } from '../../infrastructure/user.repository';
 import { RegisterTenantDto } from '../../presentation/dto/register-tenant.dto';

@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { RoleType } from '../../domain/enums';
+import { RoleType } from '@erp-system/shared-types';
 
 export class RegResponseDto {
     @Expose()
