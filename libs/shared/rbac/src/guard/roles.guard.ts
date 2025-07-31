@@ -22,13 +22,13 @@ export class RolesGuard implements CanActivate {
         const { user } = context.switchToHttp().getRequest();
 
         if (!user) {
-            this.logger.error(`Access denied, there was no authenticated user..."`);
+            this.logger.warn(`Access denied, there was no authenticated user..."`);
             throw new ForbiddenException('Credential error...');
         };
 
         // Log the issue to know troublesome users
-        if (!requiredRoles.includes(user.role?.name)) {
-            this.logger.warn(`Access denied for user "${user.id}..."`);
+        if (!requiredRoles.includes(user.role)) {
+            this.logger.warn(`Access denied for user: "${user.id} | ${user.role}"...`);
             return false;
         };
 
