@@ -1,6 +1,4 @@
 import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
-import { AppController } from './presentation/app.controller';
-import { AppService } from './application/app.service';
 import { ErpSystemSharedConfigModule } from '@erp-system/shared-config';
 import { SharedDatabaseModule } from '@erp-system/shared-database';
 import { SharedLoggerModule } from '@erp-system/shared-logger';
@@ -20,8 +18,8 @@ import { SharedRbacModule } from '@erp-system/shared-rbac';
         SharedTokenModule,
         SharedRbacModule
     ],
-    controllers: [AppController],
-    providers: [AppService],
+    controllers: [],
+    providers: [],
 })
 export class AppModule implements NestModule{
     // Apply tenant middleware on all routes
