@@ -26,6 +26,12 @@ export class AuthController {
     async loginUser(@Body(ValidationPipe) dto: LoginUserDto) {
         return await this.authService.loginUser(dto);
     }
+}
+
+
+@Controller()
+export class ExampleController {
+    constructor(private readonly authService: AuthService) {}
 
     @Get('example/link')
     @Roles(RoleType.SUPER_ADMIN)

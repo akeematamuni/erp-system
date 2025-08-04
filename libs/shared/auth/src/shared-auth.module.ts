@@ -4,6 +4,7 @@ import { User } from './domain/user.entity';
 import { UserRepository } from './infrastructure/user.repository';
 import { AuthService } from './application/auth.service';
 import { AuthController } from './presentation/auth.controller';
+import { ExampleController } from './presentation/auth.controller';
 import { TenancyModule } from '@erp-system/tenancy';
 import { SharedTokenModule } from '@erp-system/shared-token';
 import { SharedRbacModule } from '@erp-system/shared-rbac';
@@ -16,7 +17,7 @@ import { SharedRbacModule } from '@erp-system/shared-rbac';
         SharedRbacModule
     ],
     providers: [UserRepository, AuthService],
-    controllers: [AuthController],
+    controllers: [AuthController, ExampleController],
     exports: [],
 })
 export class SharedAuthModule {}
