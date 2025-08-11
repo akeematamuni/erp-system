@@ -22,7 +22,8 @@
       "@erp-system/shared-rbac": ["libs/shared/rbac/src/index.ts"],
       "@erp-system/shared-token": ["libs/shared/token/src/index.ts"],
       "@erp-system/shared-types": ["libs/shared/shared-types/src/index.ts"],
-      "@erp-system/tenancy": ["libs/tenancy/src/index.ts"]
+      "@erp-system/tenancy": ["libs/tenancy/src/index.ts"],
+      "@erp-system/users": ["libs/users/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
