@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "typeorm": "tsx --tsconfig ./tsconfig.cli.json node_modules/typeorm/cli.js",
-    "default:schema": "tsx --tsconfig ./tsconfig.cli.json libs/shared/database/src/default-schema.ts"
+    "create:schema": "tsx --tsconfig ./tsconfig.cli.json libs/shared/database/src/default-schema.ts",
+    "run:migrations": "tsx --tsconfig ./tsconfig.cli.json libs/shared/database/src/migrations.ts"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +21,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "dotenv": "^17.0.1",
+    "express": "^5.1.0",
     "fs-extra": "^11.3.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
