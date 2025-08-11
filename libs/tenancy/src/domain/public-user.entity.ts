@@ -5,7 +5,7 @@ import {
 import { Tenant } from './tenant.entity';
 
 // Holds all users in database linking them to respective tenants
-@Entity({ name: 'users', schema: 'public' })
+@Entity({ name: 'central_users', schema: 'public' })
 export class PublicUser {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
