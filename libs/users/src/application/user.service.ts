@@ -5,6 +5,7 @@ import { UserRepository } from '../infrastructure/user.repository';
 import { User } from '../domain/user.entity';
 import { TenantService } from '@erp-system/tenancy';
 import { CreateUserDto2 } from '../presentation/dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -14,6 +15,7 @@ export class UserService {
     constructor(
         @Inject(LoggerToken) private readonly base: CustomLoggerService,
         private readonly tenantService: TenantService,
+        private readonly dataSource: DataSource
     ) {
         this.logger = base.addContext(UserService.name);
     }
@@ -48,15 +50,40 @@ export class UserService {
     }
 
     async adminCreateNewUser(createUserDto: CreateUserDto2) {
-        // try {
-        //     // check if user exists on public and tenant
-        //     const existsOnPublic = await this.tenantService.resolvePublicUserEmail(
-        //         createUserDto.email
-        //     );
+        try {
+            const existsOnTenant = await this.dataSource.getRepository(User).findOne({
+                where: { email: createUserDto.email }
+            });
 
-        //     const existOnTenant = await this.
-        // } catch (error) {
-            
-        // }
+            if (existsOnTenant) {
+                this.logger.warn(`User with "${createUserDto.email}" already exists...`);
+                throw new ConflictException('User profile exists...');
+            }
+
+            // hash password
+            const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+            // create user on on public schema
+            const centralUser = await this.tenantService.registerPublicUser(
+                createUserDto.fullname,
+                createUserDto.email,
+                hashedPassword,
+                createUserDto.tenantId 
+            );
+
+            // create user on tenant schema
+            const tenantUser = new User();
+            tenantUser.fullname = createUserDto.fullname;
+            tenantUser.email = createUserDto.email;
+            tenantUser.role = createUserDto.role;
+            tenantUser.department = createUserDto.department;
+            tenantUser.createdBy = createUserDto.createdBy;
+
+            const newTenantUser = await this.addNewTenantUser(this.dataSource, tenantUser);
+            return { centralUser, newTenantUser };
+
+        } catch (error) {
+            throw error;
+        }
     }
 }
