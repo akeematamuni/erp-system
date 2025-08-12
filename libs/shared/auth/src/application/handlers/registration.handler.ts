@@ -1,7 +1,6 @@
 import { ConflictException, InternalServerErrorException, LoggerService } from '@nestjs/common';
 import { RoleType } from '@erp-system/shared-types';
-import { User } from '../../domain/user.entity';
-import { UserRepository } from '../../infrastructure/user.repository';
+import { User, UserService } from '@erp-system/users';
 import { RegisterTenantDto } from '../../presentation/dto/register-tenant.dto';
 import { TenantService, rollbackTenantCreation } from '@erp-system/tenancy';
 import * as bcrypt from 'bcrypt';
@@ -9,9 +8,11 @@ import * as bcrypt from 'bcrypt';
 // Register specific handler function
 export async function registerNewTenantAndAdmin(
     dto: RegisterTenantDto, 
+    maxRetries: number,
     logger: LoggerService,
+    userService: UserService,
     tenantService: TenantService,
-    maxRetries: number
+    
 ): Promise<any> {
     
     const { enterpriseName, fullName, email, password: pwd } = dto;
@@ -35,7 +36,9 @@ export async function registerNewTenantAndAdmin(
                 superAdmin.email = user.email;
                 superAdmin.role = RoleType.SUPER_ADMIN;
 
-                const newSuperAdmin = await new UserRepository(tenantDataSource).save(superAdmin);
+                const newSuperAdmin = await userService.addNewTenantUser(
+                    tenantDataSource, superAdmin
+                );
                 
                 logger.log(`Super admin created for tenant: ${tenant.id} | ${tenant.schema}`);
                 return {...user, ...newSuperAdmin};

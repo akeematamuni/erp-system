@@ -1,18 +1,18 @@
+import { InternalServerErrorException, LoggerService, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TenantService } from '@erp-system/tenancy';
-import { User } from '../../domain/user.entity';
-import { UserRepository } from '../../infrastructure/user.repository';
+import { UserService } from '@erp-system/users';
 import { LoginUserDto } from '../../presentation/dto/login-tenant.dto';
-import { InternalServerErrorException, LoggerService, UnauthorizedException } from '@nestjs/common';
 import { tenantDataOptions } from '@erp-system/shared-database';
 import * as bcrypt from 'bcrypt';
 
 export async function loginTenantUser(
     dto: LoginUserDto,
     logger: LoggerService,
+    userService: UserService,
     tenantService: TenantService
 ): Promise<any> {
-    let localDataSource: DataSource | null = null;
+    let tenantDataSource: DataSource | null = null;
     let maxRetries = 3;
     let retries = 0;
 
@@ -33,27 +33,34 @@ export async function loginTenantUser(
             }
 
             const schema = publicUser.tenant.schema;
-            localDataSource = new DataSource({
+            tenantDataSource = new DataSource({
                 ...tenantDataOptions,
                 schema
             });
-            await localDataSource.initialize();
+            await tenantDataSource.initialize();
 
-            const user = new UserRepository(localDataSource);
-            const localUser = await user.findByEmail(publicUser.email) as User;
+            const tenantUser = await userService.findTenantUserByEmail(
+                tenantDataSource, publicUser.email
+            );
 
-            return { publicUser, localUser };
+            if (!tenantUser) {
+                logger.error(`Tenant user search returned null`);
+                throw new NotFoundException('User not found...');
+            }
+
+            return { publicUser, tenantUser };
 
         } catch (error) {
             logger.error(`Error during login..\n${error}`);
 
             if (error instanceof UnauthorizedException) throw error;
+            if (error instanceof NotFoundException) throw error;
 
             retries++;
             if (retries >= maxRetries) {
 
-                if (localDataSource && localDataSource.isInitialized) {
-                    await localDataSource.destroy();
+                if (tenantDataSource && tenantDataSource.isInitialized) {
+                    await tenantDataSource.destroy();
                 }
                 
                 throw new InternalServerErrorException('Unable to login, please try later...');
