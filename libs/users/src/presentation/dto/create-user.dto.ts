@@ -1,4 +1,5 @@
-import { IsString, IsEmail, MinLength, IsNotEmpty } from 'class-validator';
+import { IsString, IsEmail, MinLength, IsNotEmpty, IsEnum } from 'class-validator';
+import { RoleType } from '@erp-system/shared-types';
 
 export class CreateUserDto {
     @IsString()
@@ -13,9 +14,8 @@ export class CreateUserDto {
     @MinLength(8)
     password!: string;
 
-    @IsString()
-    @IsNotEmpty()
-    role!: string;
+    @IsEnum(RoleType, {message: 'Please choose a valid role'})
+    role!: RoleType;
 
     @IsString()
     @IsNotEmpty()
