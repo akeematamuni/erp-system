@@ -7,7 +7,7 @@ import { IUserRepository } from '../domain/user.repository.interface';
 export class UserRepository implements IUserRepository {
     private readonly repo: Repository<User>;
 
-    constructor(private tenantDataSource: DataSource) {
+    constructor(private readonly tenantDataSource: DataSource) {
         this.repo = tenantDataSource.getRepository(User);
     }
 
