@@ -6,6 +6,7 @@ import { JwtGuard } from '@erp-system/shared-token';
 import { Roles, RolesGuard } from '@erp-system/shared-rbac';
 import { RoleType } from '@erp-system/shared-types';
 import { Request } from 'express';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('users')
 export class UserController {
@@ -15,14 +16,11 @@ export class UserController {
     @Roles(RoleType.SUPER_ADMIN, RoleType.ADMIN)
     @UseGuards(JwtGuard, RolesGuard)
     async createNewUser(
-        @Ip() ip: string,
-        @Req() req: Request,
+        @Ip() ip: string, @Req() req: Request,
         @Body(ValidationPipe) createUserDto: CreateUserDto
     ) {
         const adminUser = req.user as {
-            id: string,
-            role: string,
-            orgId: string
+            id: string, role: string, orgId: string
         }
 
         const newUserDto = {
@@ -31,6 +29,12 @@ export class UserController {
             createdBy: adminUser.id
         }
 
-        return await this.userService.adminCreateNewUser(newUserDto);
+        const newUserObj = await this.userService.adminCreateNewUser(newUserDto);
+
+        return plainToInstance(
+            CreateUserResponseDto,
+            newUserObj,
+            { excludeExtraneousValues: true }
+        );
     }
 }
