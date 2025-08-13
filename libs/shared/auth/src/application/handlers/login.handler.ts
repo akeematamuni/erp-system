@@ -1,9 +1,7 @@
 import { InternalServerErrorException, LoggerService, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { DataSource } from 'typeorm';
 import { TenantService } from '@erp-system/tenancy';
 import { UserService } from '@erp-system/users';
 import { LoginUserDto } from '../../presentation/dto/login-tenant.dto';
-import { tenantDataOptions } from '@erp-system/shared-database';
 import * as bcrypt from 'bcrypt';
 
 export async function loginTenantUser(
@@ -12,7 +10,6 @@ export async function loginTenantUser(
     userService: UserService,
     tenantService: TenantService
 ): Promise<any> {
-    let tenantDataSource: DataSource | null = null;
     let maxRetries = 3;
     let retries = 0;
 
@@ -33,14 +30,8 @@ export async function loginTenantUser(
             }
 
             const schema = publicUser.tenant.schema;
-            tenantDataSource = new DataSource({
-                ...tenantDataOptions,
-                schema
-            });
-            await tenantDataSource.initialize();
-
             const tenantUser = await userService.findTenantUserByEmail(
-                tenantDataSource, publicUser.email
+                publicUser.email, schema
             );
 
             if (!tenantUser) {
@@ -58,11 +49,6 @@ export async function loginTenantUser(
 
             retries++;
             if (retries >= maxRetries) {
-
-                if (tenantDataSource && tenantDataSource.isInitialized) {
-                    await tenantDataSource.destroy();
-                }
-                
                 throw new InternalServerErrorException('Unable to login, please try later...');
             };
 

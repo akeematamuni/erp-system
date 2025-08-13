@@ -19,29 +19,30 @@ export async function registerNewTenantAndAdmin(
     let retries = 0;
 
     while (retries < maxRetries) {
-        try {
-            const { 
-                tenant, tenantDataSource, dataSource
-            } = await tenantService.registerTenant(enterpriseName);
+        const password = await bcrypt.hash(pwd, 10);
 
-            const password = await bcrypt.hash(pwd, 10);
+        try {
+            const { tenant, dataSource } = await tenantService.registerTenant(enterpriseName);
 
             try {
-                const user = await tenantService.registerPublicUser(
+                const superAdmin = await tenantService.registerPublicUser(
                     fullName, email, password, tenant.id
                 );
 
-                const superAdmin = new User();
-                superAdmin.fullname = user.fullname;
-                superAdmin.email = user.email;
-                superAdmin.role = RoleType.SUPER_ADMIN;
+                if (!superAdmin) throw Error();
 
-                const newSuperAdmin = await userService.addNewTenantUser(
-                    tenantDataSource, superAdmin
+                const tenantSuperAdmin = new User();
+                tenantSuperAdmin.id = superAdmin.id;
+                tenantSuperAdmin.fullname = superAdmin.fullname;
+                tenantSuperAdmin.email = superAdmin.email;
+                tenantSuperAdmin.role = RoleType.SUPER_ADMIN;
+
+                const newTenantSuperAdmin = await userService.addNewTenantUser(
+                    tenantSuperAdmin, tenant.schema
                 );
                 
                 logger.log(`Super admin created for tenant: ${tenant.id} | ${tenant.schema}`);
-                return {...user, ...newSuperAdmin};
+                return {...superAdmin, ...newTenantSuperAdmin};
 
             } catch (error) {
                 // logger.error(`Failed to create "${tenant.schema}" super admin..`);
