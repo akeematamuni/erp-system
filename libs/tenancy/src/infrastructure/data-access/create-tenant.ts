@@ -56,25 +56,26 @@ export async function createNewTenant(
     // Run migrations on the new schema
     tenantDataSource = new DataSource({
         ...tenantDataOptions,
-        name: `${schema}-dts`,
         schema
     });
-        
+    
     try {
         await tenantDataSource.initialize();
         await tenantDataSource.runMigrations();
 
         logger.log(`Successfully ran migrations for "${schema}"`);
-        return { tenant, tenantDataSource, dataSource };
+        return { tenant, dataSource };
     
     } catch (error) {
         await rollbackTenantCreation(schema, tenant, logger, dataSource);
 
-        if (tenantDataSource && tenantDataSource.isInitialized) {
-            await tenantDataSource.destroy();
-        }
         throw new InternalServerErrorException(
             'Error occured during registration, please try later...'
         );
+
+    } finally {
+        if (tenantDataSource && tenantDataSource.isInitialized) {
+            await tenantDataSource.destroy();
+        }
     }
 }

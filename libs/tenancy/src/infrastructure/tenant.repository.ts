@@ -40,9 +40,10 @@ export class CentralRepository implements ITenantRepository, IPublicUserReposito
     }
 
     async createPublicUser(fullname: string, email: string, password: string, tenantId: string) {
-        return await createNewUser(
+        const newUser = await createNewUser(
             fullname, email, password, tenantId, this.logger, this.dataSource
         );
+        return await this.findPublicUserById(newUser.id);
     }
 
     async findPublicUserById(id: string) {
