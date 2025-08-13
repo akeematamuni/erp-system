@@ -1,5 +1,4 @@
 import { ConflictException, Inject, Injectable, InternalServerErrorException, LoggerService } from '@nestjs/common';
-import { DataSource } from 'typeorm';
 import { LoggerToken, CustomLoggerService } from '@erp-system/shared-logger';
 import { UserRepository } from '../infrastructure/user.repository';
 import { User } from '../domain/user.entity';
@@ -10,59 +9,45 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserService {
     private readonly logger: LoggerService;
-    private userRepo: UserRepository | undefined;
 
     constructor(
         @Inject(LoggerToken) private readonly base: CustomLoggerService,
         private readonly tenantService: TenantService,
-        private readonly dataSource: DataSource
+        private readonly userRepo: UserRepository
     ) {
         this.logger = base.addContext(UserService.name);
     }
 
-    async addNewTenantUser(tenantDataSource: DataSource, user: User) {
+    async addNewTenantUser(user: User, tenantSchema: string) {
         try {
-            this.userRepo = new UserRepository(tenantDataSource);
-            const exist = await this.userRepo.doesUserExist(user.email);
+            const exist = await this.userRepo.doesUserExist(user.email, tenantSchema);
 
             if (exist) {
                 this.logger.warn(`User "${user.email}" already exist...`);
                 throw new ConflictException('User already exists...');
             }
 
-            return await this.userRepo.save(user);
+            return await this.userRepo.save(user, tenantSchema);
 
         } catch (error) {
-            this.logger.error(`There was an error adding user "${user.email}\n${error}"`);
+            if (error instanceof ConflictException) throw error;
             throw new InternalServerErrorException('Error occured, please retry...');
         }
     }
 
-    async findTenantUserByEmail(tenantDataSource: DataSource, email: string) {
+    async findTenantUserByEmail(email: string, tenantSchema: string) {
         try {
-            this.userRepo = new UserRepository(tenantDataSource)
-            return await this.userRepo.findByEmail(email);
-
+            return await this.userRepo.findByEmail(email, tenantSchema);
         } catch (error) {
-            this.logger.error(`Error occured while finding user "${email}"`);
             throw new InternalServerErrorException('Error occured, please retry...');
         }
     }
 
     async adminCreateNewUser(createUserDto: CreateUserDto2) {
+        // hash password
+        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
         try {
-            const existsOnTenant = await this.dataSource.getRepository(User).findOne({
-                where: { email: createUserDto.email }
-            });
-
-            if (existsOnTenant) {
-                this.logger.warn(`User with "${createUserDto.email}" already exists...`);
-                throw new ConflictException('User profile exists...');
-            }
-
-            // hash password
-            const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
             // create user on on public schema
             const centralUser = await this.tenantService.registerPublicUser(
                 createUserDto.fullname,
@@ -71,16 +56,21 @@ export class UserService {
                 createUserDto.tenantId 
             );
 
+            if (!centralUser) throw new Error();
+
             // create user on tenant schema
             const tenantUser = new User();
+            tenantUser.id = centralUser.id;
             tenantUser.fullname = createUserDto.fullname;
             tenantUser.email = createUserDto.email;
             tenantUser.role = createUserDto.role;
             tenantUser.department = createUserDto.department;
             tenantUser.createdBy = createUserDto.createdBy;
 
-            const newTenantUser = await this.addNewTenantUser(this.dataSource, tenantUser);
-            return { centralUser, newTenantUser };
+            const tenantSchema = centralUser.tenant.schema;
+            const newTenantUser = await this.addNewTenantUser(tenantUser, tenantSchema);
+
+            return { ...newTenantUser, password: createUserDto.password };
 
         } catch (error) {
             throw error;
