@@ -1,20 +1,23 @@
 import { DataSource } from 'typeorm';
-import { PublicDataSource as pd } from './public.source';
+import { publicDataOptions } from './public.source';
 import { tenantDataOptions } from './tenant.source';
 
-async function runMigrations() {
+export async function runMigrations() {
     console.log('Starting migration script for tenants...');
 
-    try {
-        await pd.initialize();
-        const queryRunner = pd.createQueryRunner();
+    const publicDataSource = new DataSource(publicDataOptions)
+    await publicDataSource.initialize();
+    const queryRunner = publicDataSource.createQueryRunner();
+    await queryRunner.connect();
 
+    try {
         const result = await queryRunner.query(
             `SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'tenant_%';`
         );
         
         await queryRunner.release();
 
+        // console.log(`First result: ${result[0]}`);
         let tenantSchemas = result.map((row: { schema_name: string }) => row.schema_name);
         tenantSchemas.sort();
 
@@ -46,8 +49,8 @@ async function runMigrations() {
         process.exit(1);
 
     } finally {
-        if (pd && pd.isInitialized) {
-            await pd.destroy();
+        if (publicDataSource && publicDataSource.isInitialized) {
+            await publicDataSource.destroy();
         }
     }
 }
