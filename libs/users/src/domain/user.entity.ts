@@ -3,13 +3,13 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    PrimaryGeneratedColumn
+    PrimaryColumn
 } from 'typeorm';
 import { RoleType } from '@erp-system/shared-types';
 
 @Entity('tenant_users')
 export class User {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn('uuid')
     id!: string;
 
     @Column({ type: 'varchar' })
