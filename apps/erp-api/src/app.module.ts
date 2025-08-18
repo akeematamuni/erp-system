@@ -8,7 +8,8 @@ import { TenantMiddleware } from '@erp-system/tenancy';
 import { SharedAuthModule } from '@erp-system/shared-auth';
 import { SharedTokenModule } from '@erp-system/shared-token';
 import { SharedRbacModule } from '@erp-system/shared-rbac';
-import { AuthController, ExampleController } from '@erp-system/shared-auth';
+import { ExampleController } from '@erp-system/shared-auth';
+import { InventoryModule } from '@erp-system/inventory';
 
 @Module({
     imports: [
@@ -19,7 +20,8 @@ import { AuthController, ExampleController } from '@erp-system/shared-auth';
         UsersModule,
         SharedAuthModule,
         SharedTokenModule,
-        SharedRbacModule
+        SharedRbacModule,
+        InventoryModule
     ],
     controllers: [],
     providers: [],
