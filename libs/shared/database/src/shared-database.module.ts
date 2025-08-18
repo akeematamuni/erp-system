@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ErpSystemSharedConfigModule } from '@erp-system/shared-config';
 import { Tenant, PublicUser } from '@erp-system/tenancy';
 import { User } from '@erp-system/users';
+import { 
+    InvCategory, InvWarehouse, 
+    InvMaterial, InvStock, InvStockMovement 
+} from '@erp-system/inventory';
 
 @Module({
     imports: [
@@ -14,7 +18,12 @@ import { User } from '@erp-system/users';
                 type: 'postgres',
                 url: config.get<string>('DATABASE_URL'),
                 ssl: { rejectUnauthorized: false },
-                entities: [Tenant, PublicUser, User],
+                entities: [
+                    Tenant, PublicUser, User,
+                    InvCategory, InvWarehouse,
+                    InvMaterial, InvStock,
+                    InvStockMovement
+                ],
                 synchronize: false,
             })
         }),
