@@ -23,10 +23,10 @@ export class InvStockMovement {
     @Column({ type: 'numeric', precision: 18, scale: 3 })
     quantity!: string;
 
-    @Column({ type: 'varchar', nullable: true })
+    @Column({ type: 'varchar', length: 128, nullable: true })
     reason?: string;
 
-    @Column({ type: 'varchar', nullable: true })
+    @Column({ type: 'varchar', length: 24, nullable: true })
     reference?: string;
 
     @CreateDateColumn()
@@ -41,21 +41,21 @@ export class InvStockMovement {
 
     @Index()
     @Column({ type: 'uuid', nullable: true })
-    toWarehouseId!: string;
+    toWarehouseId?: string;
 
     @Index()
     @Column({ type: 'uuid', nullable: true })
-    fromWarehouseId!: string;
+    fromWarehouseId?: string;
 
     @ManyToOne(() => InvMaterial, (ivm) => ivm.stockMovements)
     @JoinColumn({ name: 'materialId' })
     material!: InvMaterial;
 
-    @ManyToOne(() => InvWarehouse, (ivw) => ivw.fromMovements, { nullable: true })
+    @ManyToOne(() => InvWarehouse, (ivw) => ivw.fromMovements)
     @JoinColumn({ name: 'fromWarehouseId' })
     fromWarehouse?: InvWarehouse;
 
-    @ManyToOne(() => InvWarehouse, (ivw) => ivw.toMovements, { nullable: true })
+    @ManyToOne(() => InvWarehouse, (ivw) => ivw.toMovements)
     @JoinColumn({ name: 'toWarehouseId' })
     toWarehouse?: InvWarehouse;
 }

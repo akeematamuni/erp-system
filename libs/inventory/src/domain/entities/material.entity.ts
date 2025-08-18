@@ -1,7 +1,6 @@
 import { 
-    PrimaryGeneratedColumn, UpdateDateColumn, 
-    CreateDateColumn, Column, Entity, Index, ManyToOne, JoinColumn,
-    OneToMany
+    PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, 
+    Column, Entity, Index, ManyToOne, JoinColumn, OneToMany
 } from 'typeorm';
 import { InvCategory } from './category.entity';
 import { InvStock } from './stock.entity';
@@ -13,13 +12,13 @@ export class InvMaterial {
     id!: string;
 
     @Index({ unique: true })
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', length: 16 })
     sku!: string;
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', length: 16 })
     name!: string;
 
-    @Column({ type: 'varchar', default: 'EA' })
+    @Column({ type: 'varchar', length: 16, default: 'EA' })
     uom!: string;
 
     @Column({ type: 'boolean', default: true })
@@ -31,10 +30,11 @@ export class InvMaterial {
     @UpdateDateColumn()
     updatedAt!: Date;
 
-    @Column({ type: 'uuid' })
+    @Index()
+    @Column({ type: 'uuid', nullable: false })
     categoryId!: string;
 
-    @ManyToOne(() => InvCategory, (ivc) => ivc.materials, { nullable: false })
+    @ManyToOne(() => InvCategory, (ivc) => ivc.materials)
     @JoinColumn({ name: 'categoryId'})
     category!: InvCategory;
 

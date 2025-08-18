@@ -1,7 +1,7 @@
 import { 
     PrimaryGeneratedColumn, Column, CreateDateColumn,
     UpdateDateColumn, Entity, ManyToOne,
-    JoinColumn, Unique, Check
+    JoinColumn, Unique, Check, Index
 } from 'typeorm';
 import { InvMaterial } from './material.entity';
 import { InvWarehouse } from './warehouse.entity';
@@ -22,17 +22,19 @@ export class InvStock {
     @UpdateDateColumn()
     updatedAt!: Date;
 
-    @Column({ type: 'uuid' })
+    @Index()
+    @Column({ type: 'uuid', nullable: false })
     materialId!: string;
 
-    @Column({ type: 'uuid' })
+    @Index()
+    @Column({ type: 'uuid', nullable: false })
     warehouseId!: string;
 
-    @ManyToOne(() => InvMaterial, (ivm) => ivm.stocks, { nullable: false })
+    @ManyToOne(() => InvMaterial, (ivm) => ivm.stocks)
     @JoinColumn({ name: 'materialId' })
     material!: InvMaterial;
     
-    @ManyToOne(() => InvWarehouse, (ivw) => ivw.stocks, { nullable: false })
+    @ManyToOne(() => InvWarehouse, (ivw) => ivw.stocks)
     @JoinColumn({ name: 'warehouseId' })
     warehouse!: InvWarehouse;
 }

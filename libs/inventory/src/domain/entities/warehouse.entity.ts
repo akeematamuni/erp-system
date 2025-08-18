@@ -11,13 +11,13 @@ export class InvWarehouse {
     id!: string;
 
     @Index({ unique: true })
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', length: 12 })
     code!: string;
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', length: 16 })
     name!: string;
 
-    @Column({ type: 'varchar', nullable: true })
+    @Column({ type: 'varchar', length: 128, nullable: true })
     address?: string;
 
     @Column({ type: 'boolean', default: true })
