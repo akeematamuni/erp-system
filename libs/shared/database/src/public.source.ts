@@ -10,7 +10,7 @@ export const publicDataOptions: PostgresConnectionOptions = {
     url: parsed.data?.DATABASE_URL,
     entities: [Tenant, PublicUser],
     migrations: ['libs/shared/database/src/migrations/public/*.ts'],
-    ssl: { rejectUnauthorized: false }
+    // ssl: { rejectUnauthorized: false }
 }
 
 export const PublicDataSource = new DataSource(publicDataOptions);

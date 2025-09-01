@@ -28,7 +28,7 @@ export const tenantDataOptions: PostgresConnectionOptions = {
         CreateInventoryTables1755521050028,
         VarcharConstraints1755524890373
     ],
-    ssl: { rejectUnauthorized: false }
+    // ssl: { rejectUnauthorized: false }
 }
 
 export const defaultSchema = 'tenant_001';
