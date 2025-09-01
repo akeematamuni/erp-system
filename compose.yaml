@@ -1,0 +1,32 @@
+# Needed Services
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16
+    container_name: erp_postgres
+    env_file:
+      - .env
+    volumes:
+      - erp_pg_data:/var/lib/postgresql/data
+    networks:
+      - erp_network
+    ports:
+      - "5433:5432"
+
+  # Redis Cache
+  redis:
+    image: redis:7
+    container_name: erp_redis
+    networks:
+      - erp_network
+    ports:
+      - "6380:6379"
+
+# Custom Network
+networks:
+  erp_network:
+    driver: bridge
+
+# Volumes
+volumes:
+  erp_pg_data:
