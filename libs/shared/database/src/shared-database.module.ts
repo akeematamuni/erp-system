@@ -17,7 +17,7 @@ import {
             useFactory: (config: ConfigService) => ({
                 type: 'postgres',
                 url: config.get<string>('DATABASE_URL'),
-                ssl: { rejectUnauthorized: false },
+                // ssl: { rejectUnauthorized: false },
                 entities: [
                     Tenant, PublicUser, User,
                     InvCategory, InvWarehouse,
